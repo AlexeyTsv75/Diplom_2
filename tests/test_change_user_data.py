@@ -1,8 +1,9 @@
+import allure
 import pytest
 import requests
+from data import UrlData
 import helper
-import data
-import allure
+from data import DataAnswerMessage
 
 
 class TestChangeUserData:
@@ -11,7 +12,7 @@ class TestChangeUserData:
     def test_change_authorized_user_name_email_success(self, change_field):
         payload = helper.new_user_login()
         changed_payload = {change_field: helper.get_random_email()}
-        response = requests.patch(data.MAIN_PAGE + data.USER,
+        response = requests.patch(UrlData.MAIN_PAGE + UrlData.USER,
                                   data=changed_payload,
                                   headers={'Authorization': payload["token"]})
         code = response.status_code
@@ -23,11 +24,11 @@ class TestChangeUserData:
     def test_change_authorized_user_password_success(self):
         payload = helper.new_user_creation()
         changed_payload = {"password": helper.get_random_email()}
-        requests.patch(data.MAIN_PAGE + data.USER,
+        requests.patch(UrlData.MAIN_PAGE + UrlData.USER,
                        data=changed_payload,
                        headers={'Authorization': payload["token"]})
         login_payload = {"email": payload["email"], "password": changed_payload["password"]}
-        login_response = requests.post(data.MAIN_PAGE + data.LOGIN, data=login_payload)
+        login_response = requests.post(UrlData.MAIN_PAGE + UrlData.LOGIN, data=login_payload)
         code = login_response.status_code
         name = login_response.json()["user"]["name"]
         helper.delete_user(payload["token"])
@@ -38,9 +39,9 @@ class TestChangeUserData:
     def test_change_unauthorized_user_data_impossible(self, change_field):
         payload = helper.new_user_login()
         changed_payload = {change_field: helper.get_random_email()}
-        response = requests.patch(data.MAIN_PAGE + data.USER,
+        response = requests.patch(UrlData.MAIN_PAGE + UrlData.USER,
                                   data=changed_payload, )
         code = response.status_code
         message = response.json()["message"]
         helper.delete_user(payload["token"])
-        assert code == 401 and message == "You should be authorised"
+        assert code == 401 and message == DataAnswerMessage.unauthorised_user

@@ -1,7 +1,8 @@
 import allure
 import requests
 import helper
-import data
+from data import UrlData
+from data import DataAnswerMessage
 
 
 class TestUserLogin:
@@ -14,7 +15,7 @@ class TestUserLogin:
             "email": user["email"],
             "password": user["password"]
         }
-        response = requests.post(data.MAIN_PAGE+data.LOGIN, data=payload)
+        response = requests.post(UrlData.MAIN_PAGE + UrlData.LOGIN, data=payload)
         code = response.status_code
         name = response.json()["user"]["name"]
         helper.delete_user(user["token"])
@@ -24,5 +25,5 @@ class TestUserLogin:
         "Проверяем невозможность авторизации с несуществующим паролем и логином")
     def test_login_with_wrong_password_and_login_impossible(self):
         payload = helper.get_random_user_payload()
-        response = requests.post(data.MAIN_PAGE+data.LOGIN, data=payload)
-        assert response.status_code == 401 and response.json()["message"] == "email or password are incorrect"
+        response = requests.post(UrlData.MAIN_PAGE + UrlData.LOGIN, data=payload)
+        assert response.status_code == 401 and response.json()["message"] == DataAnswerMessage.incorrect_data

@@ -1,8 +1,7 @@
 import random
 import allure
 import requests
-
-import data
+from data import UrlData
 
 
 @allure.step("Создаем случайный емейл")
@@ -28,7 +27,7 @@ def get_random_user_payload():
 @allure.step("Регистрация нового пользователя")
 def new_user_creation():
     payload = get_random_user_payload()
-    response = requests.post(data.MAIN_PAGE+data.REGISTRATION, data=payload)
+    response = requests.post(UrlData.MAIN_PAGE + UrlData.REGISTRATION, data=payload)
     payload["code"] = response.status_code
     payload["token"] = response.json()["accessToken"]
     payload["retoken"] = response.json()["refreshToken"]
@@ -37,13 +36,13 @@ def new_user_creation():
 
 @allure.step("Удаление пользователя")
 def delete_user(token):
-    requests.delete(data.MAIN_PAGE+data.USER, headers={'Authorization': token})
+    requests.delete(UrlData.MAIN_PAGE + UrlData.USER, headers={'Authorization': token})
 
 
 @allure.step("Авторизация пользователя")
 def new_user_login():
     payload = new_user_creation()
-    response = requests.post(data.MAIN_PAGE+data.LOGIN, data=payload)
+    response = requests.post(UrlData.MAIN_PAGE + UrlData.LOGIN, data=payload)
     payload["token"] = response.json()["accessToken"]
     payload["retoken"] = response.json()["refreshToken"]
     return payload
@@ -51,7 +50,7 @@ def new_user_login():
 
 @allure.step("Создние списка ингредиентов")
 def creation_list_of_ingredients():
-    response = requests.get(data.MAIN_PAGE+data.INGREDIENTS)
+    response = requests.get(UrlData.MAIN_PAGE + UrlData.INGREDIENTS)
     list_ingredients = response.json()["data"]
     list_hash_ingredients = []
     for ingredient in list_ingredients:
@@ -64,6 +63,6 @@ def creation_order_authorized_user(token):
     ingredients = creation_list_of_ingredients()
     list_of_ingredient = [ingredients[0], ingredients[1], ingredients[2]]
     payload_order = {"ingredients": list_of_ingredient}
-    requests.post(data.MAIN_PAGE + data.ORDER,
+    requests.post(UrlData.MAIN_PAGE + UrlData.ORDER,
                   data=payload_order,
                   headers={'Authorization': token})
